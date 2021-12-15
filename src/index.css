@@ -1,12 +1,6 @@
-@font-face {
-  font-family: 'Inter';
-  src: url('./fonts/Inter.ttf') format('ttf');
-  font-display: swap;
-}
-
 body {
   margin: 0;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #7700ee;

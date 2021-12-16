@@ -9,10 +9,8 @@ import { ThirdwebWeb3Provider } from "@3rdweb/hooks";
 ReactDOM.render(
   <React.StrictMode>
     <ThirdwebWeb3Provider supportedChainIds={[4]} connectors={{ injected: {} }}>
-      <div className="full-size">
-        <App />
-      </div>
+      <App />
     </ThirdwebWeb3Provider>
   </React.StrictMode>,
-  document.getElementById("root"),
+  document.getElementById("root")
 );

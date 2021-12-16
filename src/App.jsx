@@ -1,4 +1,3 @@
-import "./App.css";
 import { useEffect, useState, useMemo } from "react";
 // we import the useWeb3 hook from the thirdweb hooks library
 import { useWeb3 } from "@3rdweb/hooks";
@@ -15,13 +14,15 @@ const alchemyApiUrl = "";
 const sdk = new ThirdwebSDK(alchemyApiUrl || "rinkeby");
 
 const bundleDropModule = sdk.getBundleDropModule(
-  "0x2fE4C89bf3b7267Db53720E9b4318c74B00C325C",
+  "0x2fE4C89bf3b7267Db53720E9b4318c74B00C325C"
 );
 
-const tokenModule = sdk.getTokenModule("0xE0a33150469AD506717bA6f32CA8ff7973654554");
+const tokenModule = sdk.getTokenModule(
+  "0xE0a33150469AD506717bA6f32CA8ff7973654554"
+);
 
 const voteModule = sdk.getVoteModule(
-  "0xeC9E737eBadCC9E4B9E9F9F4D396B1dd8f145868",
+  "0xeC9E737eBadCC9E4B9E9F9F4D396B1dd8f145868"
 );
 
 const App = () => {
@@ -138,7 +139,7 @@ const App = () => {
           // a member *may* have no tokens at all, in which case we'll fall back to passing 0
           memberTokenAmounts[address] || 0,
           // still the same token decimals as we used when we created the token (18)
-          18,
+          18
         ),
       };
     });
@@ -169,14 +170,13 @@ const App = () => {
   // we want to keep track of whether the wallet is currently voting or not, here goes another state hook
   const [isVoting, setIsVoting] = useState(false);
 
-
   // if there was some kind of error we want to display it
   if (error) {
     // one common error happens when the user's wallet is connected to the wrong network
     // we will handle this error by displaying a message to the user and asking them to switch to rinkeby
     if (error.name === "UnsupportedChainIdError") {
       return (
-        <div className="container-xs mx-auto my-auto p-1">
+        <div className="unsupported-network">
           <h2>Please connect to Rinkeby</h2>
           <p>
             This dapp only works on the Rinkeby network, please switch networks
@@ -187,7 +187,7 @@ const App = () => {
     }
     // if some other error happens we just display the message to the user
     return (
-      <div className="container-xs mx-auto my-auto error br-1 p-1">
+      <div className="error">
         <h2>An error occurred</h2>
         <p>{error.message}</p>
       </div>
@@ -197,9 +197,9 @@ const App = () => {
   // if the user has not connected their wallet yet we want to display a button to connect
   if (!address) {
     return (
-      <div className="container mx-auto my-auto align-center flex column text-center">
+      <div className="connect-wallet">
         <h1>Welcome to 🍪DAO</h1>
-        <button onClick={() => connectWallet("injected")} className="btn-hero">
+        <button onClick={() => connectWallet("injected")}>
           Connect your wallet
         </button>
       </div>
@@ -209,11 +209,10 @@ const App = () => {
   // if the user has connected their wallet but they have not claimed the drop yet, we need to display a button to claim
   if (!hasClaimedNFT) {
     return (
-      <div className="container mx-auto my-auto align-center flex column text-center">
+      <div className="mint-nft">
         <h1>Mint your free 🍪DAO Membership NFT</h1>
         <button
           disabled={isClaiming}
-          className="btn-hero"
           onClick={() => {
             // we set the isClaiming state to true to disable the button until the transaction is complete
             setIsClaiming(true);
@@ -245,13 +244,13 @@ const App = () => {
   // if the user has already claimed their nft we want to display the interal DAO page to them, only DAO members will see this
   if (hasClaimedNFT) {
     return (
-      <div className="container mx-auto my-auto align-center flex column text-center">
+      <div className="member-page">
         <h1>🍪DAO Member Page</h1>
         <p>Congratulations on being a member</p>
-        <div className="flex space-around w-full text-left">
-          <div className="flex column w-50">
+        <div>
+          <div>
             <h2>Member List</h2>
-            <table className="bg-white p-1 br-1 color-black shadow-md">
+            <table className="card">
               <thead>
                 <tr>
                   <th>Address</th>
@@ -270,7 +269,7 @@ const App = () => {
               </tbody>
             </table>
           </div>
-          <div className="flex column w-50">
+          <div>
             <h2>Active Proposals</h2>
             <form
               onSubmit={async (e) => {
@@ -289,7 +288,7 @@ const App = () => {
                   };
                   proposal.votes.forEach((vote) => {
                     const elem = document.getElementById(
-                      proposal.proposalId + "-" + vote.type,
+                      proposal.proposalId + "-" + vote.type
                     );
 
                     if (elem.checked) {
@@ -307,15 +306,13 @@ const App = () => {
                   try {
                     await Promise.all(
                       votes.map((vote) =>
-                        voteModule.vote(vote.proposalId, vote.vote),
-                      ),
+                        voteModule.vote(vote.proposalId, vote.vote)
+                      )
                     );
                     try {
                       // if the vote is ready to be executed we need to execute it
                       await Promise.all(
-                        votes.map((vote) =>
-                          voteModule.execute(vote.proposalId),
-                        ),
+                        votes.map((vote) => voteModule.execute(vote.proposalId))
                       );
                     } catch (err) {
                       console.error("failed to execute votes", err);
@@ -330,15 +327,11 @@ const App = () => {
                   setIsVoting(false);
                 }
               }}
-              className="flex column"
             >
               {proposals.map((proposal, index) => (
-                <div
-                  key={proposal.proposalId}
-                  className="flex column bg-white p-1 br-1 color-black shadow-md"
-                >
-                  <h5 className="color-primary">{proposal.description}</h5>
-                  <div className="flex space-between">
+                <div key={proposal.proposalId} className="card">
+                  <h5>{proposal.description}</h5>
+                  <div>
                     {proposal.votes.map((vote) => (
                       <div key={vote.type}>
                         <input
@@ -357,10 +350,10 @@ const App = () => {
                   </div>
                 </div>
               ))}
-              <button disabled={isVoting} className="btn-hero" type="submit">
+              <button disabled={isVoting} type="submit">
                 {isVoting ? "Voting..." : "Submit Votes"}
               </button>
-              <small className="text-center">
+              <small>
                 This will trigger multiple transactions that you will need to
                 sign.
               </small>
@@ -369,7 +362,7 @@ const App = () => {
         </div>
       </div>
     );
-  };
+  }
 
   // this should never be reached, but just in case we render something
   return (

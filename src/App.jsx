@@ -4,7 +4,7 @@ const App = () => {
   const screenToShow = () => {
     return (
       <div className="landing h-full">
-        <h1>Welcome to CookieDAO</h1>
+        <h1>Welcome to 🍪DAO</h1>
       </div>
     );
   };

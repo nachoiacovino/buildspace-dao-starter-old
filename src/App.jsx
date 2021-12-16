@@ -167,7 +167,8 @@ const App = () => {
       });
   }, [hasClaimedNFT]);
 
-  console.log("*** proposals", proposals);
+  // we want to keep track of whether the wallet is currently voting or not, here goes another state hook
+  const [isVoting, setIsVoting] = useState(false);
 
   // if there was some kind of error we want to display it
   if (error) {
@@ -251,7 +252,7 @@ const App = () => {
         <div className="flex space-around w-full text-left">
           <div className="flex column w-50">
             <h2>Member List</h2>
-            <table>
+            <table className="bg-white p-1 br-1 color-black shadow-md">
               <thead>
                 <tr>
                   <th>Address</th>
@@ -271,12 +272,71 @@ const App = () => {
             </table>
           </div>
           <div className="flex column w-50">
-            <h2>Active Votes</h2>
-            <div className="flex column">
+            <h2>Active Proposals</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                //before we do async things, we want to disable the button to prevent double clicks
+                setIsVoting(true);
+
+                // lets get the votes from the form for the values
+                const votes = proposals.map((proposal) => {
+                  let voteResult = {
+                    proposalId: proposal.proposalId,
+                    //abstain by default
+                    vote: 2,
+                  };
+                  proposal.votes.forEach((vote) => {
+                    const elem = document.getElementById(
+                      proposal.proposalId + "-" + vote.type,
+                    );
+
+                    if (elem.checked) {
+                      voteResult.vote = vote.type;
+                      return;
+                    }
+                  });
+                  return voteResult;
+                });
+
+                // first we need to make sure the user delegates their token to vote
+                try {
+                  await tokenModule.delegateTo(address);
+                  // then we need to vote on the proposals
+                  try {
+                    await Promise.all(
+                      votes.map((vote) =>
+                        voteModule.vote(vote.proposalId, vote.vote),
+                      ),
+                    );
+                    try {
+                      // if the vote is ready to be executed we need to execute it
+                      await Promise.all(
+                        votes.map((vote) =>
+                          voteModule.execute(vote.proposalId),
+                        ),
+                      );
+                    } catch (err) {
+                      console.error("failed to execute votes", err);
+                    }
+                  } catch (err) {
+                    console.error("failed to vote", err);
+                  }
+                } catch (err) {
+                  console.error("failed to delegate tokens");
+                } finally {
+                  // in *either* case we need to set the isVoting state to false to enable the button again
+                  setIsVoting(false);
+                }
+              }}
+              className="flex column"
+            >
               {proposals.map((proposal, index) => (
                 <div
                   key={proposal.proposalId}
-                  className="flex column bg-white p-1 br-1 color-black"
+                  className="flex column bg-white p-1 br-1 color-black shadow-md"
                 >
                   <h5 className="color-primary">{proposal.description}</h5>
                   <div className="flex space-between">
@@ -287,6 +347,8 @@ const App = () => {
                           id={proposal.proposalId + "-" + vote.type}
                           name={proposal.proposalId}
                           value={vote.type}
+                          //default the "abstain" vote to chedked
+                          defaultChecked={vote.type === 2}
                         />
                         <label htmlFor={proposal.proposalId + "-" + vote.type}>
                           {vote.label}
@@ -296,14 +358,26 @@ const App = () => {
                   </div>
                 </div>
               ))}
-            </div>
+              <button disabled={isVoting} className="btn-hero" type="submit">
+                {isVoting ? "Voting..." : "Submit Votes"}
+              </button>
+              <small className="text-center">
+                This will trigger multiple transactions that you will need to
+                sign.
+              </small>
+            </form>
           </div>
         </div>
       </div>
     );
   }
 
-  return null;
+  // this should never be reached, but just in case we render something
+  return (
+    <div>
+      <p>You found the secret page, have a 🍪.</p>
+    </div>
+  );
 };
 
 export default App;

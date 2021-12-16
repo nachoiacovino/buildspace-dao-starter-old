@@ -7,7 +7,7 @@ const appModule = sdk.getAppModule(
 );
 
 try {
-  // ast module we're deploying today!
+  // last module we're deploying today!
   // the vote module allows you to create "proposals" that governance token holders can vote on on-chain.
   const voteModule = await appModule.deployVoteModule({
     // the name of the module, you will likely be deploying multiple votes over time, so it makes sense to add a # number to the name

@@ -8,7 +8,3 @@ body {
   color: #fff;
   overflow-x: hidden;
 }
-.full-size {
-  min-height: 100vh;
-  display: flex;
-}

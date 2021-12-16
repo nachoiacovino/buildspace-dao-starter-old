@@ -15,15 +15,13 @@ const alchemyApiUrl = "";
 const sdk = new ThirdwebSDK(alchemyApiUrl || "rinkeby");
 
 const App = () => {
-  const screenToShow = () => {
-    return (
-      <div className="landing h-full">
-        <h1>Welcome to 🍪DAO</h1>
-      </div>
-    );
-  };
-
-  return <div>{screenToShow()}</div>;
+  return (
+    <div className="container mx-auto my-auto align-center flex column text-center">
+      <h1>Welcome to 🍪DAO</h1>
+      <button onClick={() => { }} className="btn-hero">
+        Connect your wallet
+      </button>
+    </div>);
 };
 
 export default App;

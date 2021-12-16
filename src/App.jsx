@@ -1,6 +1,6 @@
 const App = () => {
   return (
-    <div className="container mx-auto my-auto align-center flex column text-center">
+    <div className="landing">
       <h1>Welcome to 🍪DAO</h1>
     </div>
   );

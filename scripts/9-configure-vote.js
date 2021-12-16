@@ -21,10 +21,6 @@ try {
   // this means that when there is a proposal to mint additional governance tokens, the vote module will be able to execute the minting if the proposal passes
   await tokenModule.grantRole("minter", voteModule.address);
 
-  //next we'll give the vote module permissions to transfer existing governance tokens
-  // this means that when there is a proposal to transfer existing governance tokens, the vote module will be able to execute the transfer if the proposal passes
-  await tokenModule.grantRole("transfer", voteModule.address);
-
   // we'll log out a success message when this is done
   console.log(
     "Successfully gave vote module permissions to act on token module",
@@ -60,7 +56,7 @@ try {
           "mint",
           [
             // the first parameter is the recipient of the tokens, we want to mint them to the DAO treasury, so we'll pass the address of the token module
-            tokenModule.address,
+            voteModule.address,
 
             // the second parameter defines how many additional tokens will be minted
             // and our friendly neighborhood ethers utils are back to help us parse our amount to have 18 decimals

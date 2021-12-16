@@ -36,9 +36,6 @@ const App = () => {
     sdk.setProviderOrSigner(signer);
   }, [signer]);
 
-  // we use the useState hook to keep track of whether the current user has claimed their nft or not
-  const [hasClaimedNFT, setHasClaimedNFT] = useState(false);
-
   // when the user clicks the claim button, we'll want to disable it until the transaction is complete
   // so let's use a useState hook to keep track of whether the button is disabled or not
   const [isClaiming, setIsClaiming] = useState(false);
@@ -79,46 +76,32 @@ const App = () => {
     );
   }
 
-  // if the user has connected their wallet but they have not claimed the drop yet, we need to display a button to claim
-  if (!hasClaimedNFT) {
-    return (
-      <div className="container mx-auto my-auto align-center flex column text-center">
-        <h1>Mint your free 🍪DAO Membership NFT</h1>
-        <button
-          disabled={isClaiming}
-          className="btn-hero"
-          onClick={() => {
-            // we set the isClaiming state to true to disable the button until the transaction is complete
-            setIsClaiming(true);
-            // we call the "claim" function on the bundleDrop module
-            // the "0" is the token id of the nft we want to claim
-            // the "1" is the amount of tokens we want to claim
-            bundleDropModule
-              .claim("0", 1)
-              .then(() => {
-                // if the claim function is successful we set the hasClaimedNFT state to true
-                setHasClaimedNFT(true);
-              })
-              .catch((err) => {
-                // if the claim function fails we log out the error
-                console.error("failed to claim", err);
-              })
-              .finally(() => {
-                // in *either* case we need to set the isClaiming state to false to enable the button again
-                setIsClaiming(false);
-              });
-          }}
-        >
-          {isClaiming ? "Minting..." : "Mint your nft (FREE)"}
-        </button>
-      </div>
-    );
-  }
-
-  // this should never be reached, but just in case we render something
   return (
-    <div>
-      <p>You found the secret page, have a 🍪.</p>
+    <div className="container mx-auto my-auto align-center flex column text-center">
+      <h1>Mint your free 🍪DAO Membership NFT</h1>
+      <button
+        disabled={isClaiming}
+        className="btn-hero"
+        onClick={() => {
+          // we set the isClaiming state to true to disable the button until the transaction is complete
+          setIsClaiming(true);
+          // we call the "claim" function on the bundleDrop module
+          // the "0" is the token id of the nft we want to claim
+          // the "1" is the amount of tokens we want to claim
+          bundleDropModule
+            .claim("0", 1)
+            .catch((err) => {
+              // if the claim function fails we log out the error
+              console.error("failed to claim", err);
+            })
+            .finally(() => {
+              // in *either* case we need to set the isClaiming state to false to enable the button again
+              setIsClaiming(false);
+            });
+        }}
+      >
+        {isClaiming ? "Minting..." : "Mint your nft (FREE)"}
+      </button>
     </div>
   );
 };

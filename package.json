@@ -2,7 +2,9 @@
   "name": "cookiedao",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@3rdweb/hooks": "^1.6.0",
     "@3rdweb/sdk": "1.25.6-0",
@@ -10,7 +12,7 @@
     "ethers": "^5.5.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react-scripts": "^5.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

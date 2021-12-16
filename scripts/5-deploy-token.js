@@ -2,7 +2,7 @@
 import sdk from "./1-initialize-sdk.js";
 
 // in order to deploy the new module we need our old friend the app module again.
-const app = sdk.getAppModule("<APP_MODULE>");
+const app = sdk.getAppModule("<APP_MODULE_ADDRESS>");
 
 /**
  *

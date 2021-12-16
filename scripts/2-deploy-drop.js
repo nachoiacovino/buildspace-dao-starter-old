@@ -5,7 +5,7 @@ import sdk from "./1-initialize-sdk.js";
 import { readFileSync } from "fs";
 
 //in order to deploy the new module we need to first know which app we are deploying it to
-const app = sdk.getAppModule("<YOUR-APP-MODULE>");
+const app = sdk.getAppModule("<APP_MODULE_ADDRESS>");
 
 /**
  *

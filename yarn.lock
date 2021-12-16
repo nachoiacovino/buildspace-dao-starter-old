@@ -7,13 +7,10 @@
   resolved "https://registry.yarnpkg.com/@3rdweb/chain-icons/-/chain-icons-1.0.1.tgz#00ade9274dc87488c59248350981f300d4a9d912"
   integrity sha512-573b0CmKwi9Vf8ETRjNX8VzSqc9s1cwMu5pw7yUI2YTuBimgd15Hu/prnfyZ5efrIZUPDCJVaqNAc6v3fuGmzA==
 
-"@3rdweb/contracts@1.15.0-5":
-  version "1.15.0-5"
-  resolved "https://registry.yarnpkg.com/@3rdweb/contracts/-/contracts-1.15.0-5.tgz#712646f9befbbc6ef88960c866662154f6a474d2"
-  integrity sha512-YyOh1Zlvh/VVIWj/0lwqn5iOU3HTGCD3N58x6xfKVIM6xvbh/pgl8HJCOfdN1f4jRZhusNB5o4U2SMvMohKVtw==
-  dependencies:
-    "@chainlink/contracts" "^0.2.2"
-    "@openzeppelin/contracts" "^4.3.3"
+"@3rdweb/contracts@^1.16.0":
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/@3rdweb/contracts/-/contracts-1.16.0.tgz#06646cac2801eb193f3b6556146c5c1609fd04cd"
+  integrity sha512-8QPoCBWeN/m46iDusX/ooUbJeXrRMYOSfMEyrEMLR/YWCYRMeW8/n1bQ9wuKg0UlIj/x7cTtDshC4UDZ+jy+9w==
 
 "@3rdweb/hooks@^1.4.0", "@3rdweb/hooks@^1.6.0":
   version "1.6.0"
@@ -31,12 +28,12 @@
     "@web3-react/walletlink-connector" "^6.2.8"
     tiny-invariant "^1.2.0"
 
-"@3rdweb/sdk@^1.25.3":
-  version "1.25.3"
-  resolved "https://registry.yarnpkg.com/@3rdweb/sdk/-/sdk-1.25.3.tgz#d44b7c53261d4bac19e7c744fa236df342c7ee9b"
-  integrity sha512-OUWm8BiuYyeD0QNMWLuZKh5UCxr3M3JxniXMmUgdjy6uRdW4GgAPBOEWPnVKMouqd4uk8KqUMOoyo3kKJR4IGQ==
+"@3rdweb/sdk@1.25.6-0":
+  version "1.25.6-0"
+  resolved "https://registry.yarnpkg.com/@3rdweb/sdk/-/sdk-1.25.6-0.tgz#e9167fc75d44f0cb4ad672c8bd27c50c7932b36a"
+  integrity sha512-s4HhYCmP9FcNEI4+PaxXHeQzd+0lBYVmX0OPVPciy5/NwJVD/cdjl+GHmGU8CkK7ggHJhnSDObJY8J2aJwiYrw==
   dependencies:
-    "@3rdweb/contracts" "1.15.0-5"
+    "@3rdweb/contracts" "^1.16.0"
     "@ethersproject/bignumber" "^5.5.0"
     "@ethersproject/bytes" "^5.4.0"
     "@ethersproject/constants" "^5.5.0"
@@ -1132,11 +1129,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@chainlink/contracts@^0.2.2":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@chainlink/contracts/-/contracts-0.2.3.tgz#f4ef1750caef1682c537a99559b5b95629436303"
-  integrity sha512-hf4b8OEfEqfjC9addvXCrE2SEybNwN1r971vxFYhL/l/yDTTMAk0jmGZYtfUPDOB/qY7FfrOXuxlEVQ+ojZgZw==
-
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
@@ -1828,11 +1820,6 @@
   dependencies:
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
-
-"@openzeppelin/contracts@^4.3.3":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.4.1.tgz#3382db2cd83ab565ed9626765e7da92944b45de8"
-  integrity sha512-o+pHCf/yMLSlV5MkDQEzEQL402i6SoRnktru+0rdSxVEFZcTzzGhZCAtZjUFyKGazMSv1TilzMg+RbED1N8XHQ==
 
 "@pedrouid/environment@^1.0.1":
   version "1.0.1"

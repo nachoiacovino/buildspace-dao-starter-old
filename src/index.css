@@ -13,6 +13,15 @@ body {
   display: flex;
 }
 
+h1 {
+  font-size: 5rem;
+}
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+}
+
 .unsupported-network {
   width: 340px;
   max-width: 100%;
@@ -60,7 +69,7 @@ body {
   width: 50%;
   gap: 1rem;
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .member-page > div {
     flex-direction: column;
   }

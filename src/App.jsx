@@ -18,6 +18,8 @@ const bundleDropModule = sdk.getBundleDropModule(
   "0x2fE4C89bf3b7267Db53720E9b4318c74B00C325C",
 );
 
+const tokenModule = sdk.getTokenModule("0xE0a33150469AD506717bA6f32CA8ff7973654554");
+
 const App = () => {
   // we use the useWeb3 hook to get access to the web3 context
   // connectWallet: a function that lets the user connect their wallet
@@ -74,6 +76,69 @@ const App = () => {
         console.error("failed to nft balance", error);
       });
   }, [address]);
+
+  // we need to get the memberlist from the bundleDrop module
+  // to do this first we need to keep track of it somewhere, another useState!
+  const [memberAddresses, setMemberAddresses] = useState([]);
+
+  // we use this useEffect to get the memberlist if the connected wallet is a member (no need to fetch it if the user is not a mamber)
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here
+      return;
+    }
+    // we use bundledrop module to get all the addresses that have minted the nft
+    bundleDropModule
+      // "0" is the id of the nft we want to get the memberlist of
+      .getAllClaimerAddresses("0")
+      .then((addresses) => {
+        // if it is successfull we just set the memberList into the state
+        setMemberAddresses(addresses);
+      })
+      .catch((err) => {
+        // if it fails we log the error to the console
+        console.error("failed to get member list", err);
+      });
+  }, [hasClaimedNFT]);
+
+  // we would also like to display the token amount that the members holding, so we'll use another useState hook
+  const [memberTokenAmounts, setMemberTokenAmounts] = useState({});
+
+  //similarly to the useEffect before we'll use this useEffect to get the token amounts of the members (but only if the connected wallet is a member)
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here
+      return;
+    }
+    // we use the token module to get the token amounts of the members
+    tokenModule
+      .getAllHolderBalances()
+      .then((amounts) => {
+        // if it is successfull we just set the memberTokenAmounts into the state
+        setMemberTokenAmounts(amounts);
+      })
+      .catch((err) => {
+        // if it fails we log the error to the console
+        console.error("failed to get token amounts", err);
+      });
+  }, [hasClaimedNFT]);
+
+  // now we need to combine the memberAddresses and the token amounts into a single array
+  const memberList = useMemo(() => {
+    return memberAddresses.map((address) => {
+      return {
+        // we return back the address of the member
+        address,
+        // and we add on the tokenAmount of that member, oh hey our old friend the ethers.utils is back!
+        tokenAmount: ethers.utils.formatUnits(
+          // a member *may* have no tokens at all, in which case we'll fall back to passing 0
+          memberTokenAmounts[address] || 0,
+          // still the same token decimals as we used when we created the token (18)
+          18,
+        ),
+      };
+    });
+  }, [memberAddresses, memberTokenAmounts]);
 
   // if there was some kind of error we want to display it
   if (error) {
@@ -153,6 +218,29 @@ const App = () => {
       <div className="container mx-auto my-auto align-center flex column text-center">
         <h1>🍪DAO Member Page</h1>
         <p>Congratulations on being a member</p>
+        <div className="flex space-around w-full text-left">
+          <div className="flex column w-50">
+            <h2>Member List</h2>
+            <table className="bg-white p-1 br-1 color-black shadow-md">
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>Token Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {memberList.map((member) => {
+                  return (
+                    <tr key={member.address}>
+                      <td>{shortenAddress(member.address)}</td>
+                      <td>{member.tokenAmount}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     );
   };

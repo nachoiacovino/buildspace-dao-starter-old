@@ -13,18 +13,6 @@ const shortenAddress = (str) => {
 // we instatiate the sdk with the Alchemy API URL or rinkeby network name
 const alchemyApiUrl = "";
 const sdk = new ThirdwebSDK(alchemyApiUrl || "rinkeby");
-// we can grab the bundleDropModule from the sdk, we'll need it later
-const bundleDropModule = sdk.getBundleDropModule(
-  "<DROP_MODULE_ADDRESS>",
-);
-// we can grab the tokenModule from the sdk, we'll need it later
-const tokenModule = sdk.getTokenModule(
-  "<TOKEN_MODULE_ADDRESS>",
-);
-// we can grab the tokenModule from the sdk, we'll need it later
-const voteModule = sdk.getVoteModule(
-  "<VOTE_MODULE_ADDRESS>",
-);
 
 const App = () => {
   const screenToShow = () => {

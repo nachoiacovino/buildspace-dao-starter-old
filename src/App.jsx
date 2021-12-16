@@ -20,6 +20,10 @@ const bundleDropModule = sdk.getBundleDropModule(
 
 const tokenModule = sdk.getTokenModule("0xE0a33150469AD506717bA6f32CA8ff7973654554");
 
+const voteModule = sdk.getVoteModule(
+  "0xeC9E737eBadCC9E4B9E9F9F4D396B1dd8f145868",
+);
+
 const App = () => {
   // we use the useWeb3 hook to get access to the web3 context
   // connectWallet: a function that lets the user connect their wallet
@@ -140,6 +144,32 @@ const App = () => {
     });
   }, [memberAddresses, memberTokenAmounts]);
 
+  // we want to keep track of current proposals, so we'll use another useState hook
+  const [proposals, setProposals] = useState([]);
+
+  //in order to fetch the proposals we'll use a useEffect hook again
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here, we don't want to fetch proposals if the user has not claimed their nft since we won't be displaying them
+      return;
+    }
+    // we use the vote module to get all the proposals
+    voteModule
+      .getAll()
+      .then((proposals) => {
+        // if it is successfull we just set the proposals into the state
+        setProposals(proposals);
+      })
+      .catch((err) => {
+        // if it fails we log the error to the console
+        console.error("failed to get proposals", err);
+      });
+  }, [hasClaimedNFT]);
+
+  // we want to keep track of whether the wallet is currently voting or not, here goes another state hook
+  const [isVoting, setIsVoting] = useState(false);
+
+
   // if there was some kind of error we want to display it
   if (error) {
     // one common error happens when the user's wallet is connected to the wrong network
@@ -239,6 +269,102 @@ const App = () => {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="flex column w-50">
+            <h2>Active Proposals</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                //before we do async things, we want to disable the button to prevent double clicks
+                setIsVoting(true);
+
+                // lets get the votes from the form for the values
+                const votes = proposals.map((proposal) => {
+                  let voteResult = {
+                    proposalId: proposal.proposalId,
+                    //abstain by default
+                    vote: 2,
+                  };
+                  proposal.votes.forEach((vote) => {
+                    const elem = document.getElementById(
+                      proposal.proposalId + "-" + vote.type,
+                    );
+
+                    if (elem.checked) {
+                      voteResult.vote = vote.type;
+                      return;
+                    }
+                  });
+                  return voteResult;
+                });
+
+                // first we need to make sure the user delegates their token to vote
+                try {
+                  await tokenModule.delegateTo(address);
+                  // then we need to vote on the proposals
+                  try {
+                    await Promise.all(
+                      votes.map((vote) =>
+                        voteModule.vote(vote.proposalId, vote.vote),
+                      ),
+                    );
+                    try {
+                      // if the vote is ready to be executed we need to execute it
+                      await Promise.all(
+                        votes.map((vote) =>
+                          voteModule.execute(vote.proposalId),
+                        ),
+                      );
+                    } catch (err) {
+                      console.error("failed to execute votes", err);
+                    }
+                  } catch (err) {
+                    console.error("failed to vote", err);
+                  }
+                } catch (err) {
+                  console.error("failed to delegate tokens");
+                } finally {
+                  // in *either* case we need to set the isVoting state to false to enable the button again
+                  setIsVoting(false);
+                }
+              }}
+              className="flex column"
+            >
+              {proposals.map((proposal, index) => (
+                <div
+                  key={proposal.proposalId}
+                  className="flex column bg-white p-1 br-1 color-black shadow-md"
+                >
+                  <h5 className="color-primary">{proposal.description}</h5>
+                  <div className="flex space-between">
+                    {proposal.votes.map((vote) => (
+                      <div key={vote.type}>
+                        <input
+                          type="radio"
+                          id={proposal.proposalId + "-" + vote.type}
+                          name={proposal.proposalId}
+                          value={vote.type}
+                          //default the "abstain" vote to chedked
+                          defaultChecked={vote.type === 2}
+                        />
+                        <label htmlFor={proposal.proposalId + "-" + vote.type}>
+                          {vote.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button disabled={isVoting} className="btn-hero" type="submit">
+                {isVoting ? "Voting..." : "Submit Votes"}
+              </button>
+              <small className="text-center">
+                This will trigger multiple transactions that you will need to
+                sign.
+              </small>
+            </form>
           </div>
         </div>
       </div>

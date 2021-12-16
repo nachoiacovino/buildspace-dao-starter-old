@@ -301,18 +301,44 @@ const App = () => {
 
                 // first we need to make sure the user delegates their token to vote
                 try {
-                  await tokenModule.delegateTo(address);
+                  //we'll check if the wallet still needs to delegate their tokens before they can vote
+                  const delegation = await tokenModule.getDelegationOf(address);
+                  // if the delegation is the 0x0 address that means they have not delegated their governance tokens yet
+                  if (delegation === ethers.constants.AddressZero) {
+                    //if they haven't delegated their tokens yet, we'll have them delegate them before voting
+                    await tokenModule.delegateTo(address);
+                  }
                   // then we need to vote on the proposals
                   try {
                     await Promise.all(
-                      votes.map((vote) =>
-                        voteModule.vote(vote.proposalId, vote.vote)
-                      )
+                      votes.map(async (vote) => {
+                        // before voting we first need to check whether the proposal is open for voting
+                        // we first need to get the latest state of the proposal
+                        const proposal = await voteModule.get(vote.proposalId);
+                        // then we check if the proposal is open for voting (state === 1 means it is open)
+                        if (proposal.state === 1) {
+                          // if it is open for voting, we'll vote on it
+                          return voteModule.vote(vote.proposalId, vote.vote);
+                        }
+                        // if the proposal is not open for voting we just return nothing, letting us continue
+                        return;
+                      })
                     );
                     try {
-                      // if the vote is ready to be executed we need to execute it
+                      // if any of the propsals are ready to be executed we'll need to execute them
+                      // a proposal is ready to be executed if it is in state 4
                       await Promise.all(
-                        votes.map((vote) => voteModule.execute(vote.proposalId))
+                        votes.map(async (vote) => {
+                          // we'll first get the latest state of the proposal again, since we may have just voted before
+                          const proposal = await voteModule.get(
+                            vote.proposalId
+                          );
+
+                          //if the state is in state 4 (meaning that it is ready to be executed), we'll execute the proposal
+                          if (proposal.state === 4) {
+                            return voteModule.execute(vote.proposalId);
+                          }
+                        })
                       );
                     } catch (err) {
                       console.error("failed to execute votes", err);

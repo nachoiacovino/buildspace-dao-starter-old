@@ -219,7 +219,6 @@ const App = () => {
             // we call the "claim" function on the bundleDrop module
             // the "0" is the token id of the nft we want to claim
             // the "1" is the amount of tokens we want to claim
-            console.log("*** bundledropModuel", bundleDropModule);
             bundleDropModule
               .claim("0", 1)
               .then(() => {

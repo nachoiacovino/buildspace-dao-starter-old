@@ -9,13 +9,19 @@ const bundleDrop = sdk.getBundleDropModule(
 );
 
 try {
+  // we can create multiple NFTs at once, so we'll use an array here
+  // even though we're only creating one NFT, we still need to use an array because the create function expects an array of NFTs
   await bundleDrop.createBatch([
     {
+      // what would you like to name your NFT?
       name: "Chocolate Cookie",
+      // you can also set the description of your NFT (this is optional)
       description: "This NFT will give you access to CookieDAO!",
+      // the image of your NFT
       image: readFileSync("scripts/assets/basic-cookie.png"),
     },
   ]);
+  // we'll log out a success message when this is done
   console.log("Successfully created a new NFT in the drop!");
 } catch (error) {
   console.error("failed to create the new NFT", error);

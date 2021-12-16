@@ -9,23 +9,25 @@ import sdk from "./1-initialize-sdk.js";
 
 // one last time we'll grab our token module
 const tokenModule = sdk.getTokenModule(
-  "0xE0a33150469AD506717bA6f32CA8ff7973654554",
+  "0xE0a33150469AD506717bA6f32CA8ff7973654554"
 );
 
-try {
-  // let's log out the current roles that exist on the DAO treasury
-  console.log(
-    "Roles before revoking ourselves",
-    await tokenModule.getAllRoleMembers(),
-  );
-  // we will revoke ourselves from every role on the DAO treasury
-  await tokenModule.revokeAllRolesFromAddress(process.env.WALLET_ADDRESS);
-  // let's log out the roles we on the DAO treasury after revoking ourselves
-  console.log(
-    "Roles after revoking ourselves",
-    await tokenModule.getAllRoleMembers(),
-  );
-  console.log("Successfully revoked our access to the DAO treasury");
-} catch (error) {
-  console.error("Failed to revoke ourselves from the DAO trasury", error);
-}
+(async () => {
+  try {
+    // let's log out the current roles that exist on the DAO treasury
+    console.log(
+      "Roles before revoking ourselves",
+      await tokenModule.getAllRoleMembers()
+    );
+    // we will revoke ourselves from every role on the DAO treasury
+    await tokenModule.revokeAllRolesFromAddress(process.env.WALLET_ADDRESS);
+    // let's log out the roles we on the DAO treasury after revoking ourselves
+    console.log(
+      "Roles after revoking ourselves",
+      await tokenModule.getAllRoleMembers()
+    );
+    console.log("Successfully revoked our access to the DAO treasury");
+  } catch (error) {
+    console.error("Failed to revoke ourselves from the DAO trasury", error);
+  }
+})();

@@ -1,10 +1,12 @@
+// we'll use these hooks later as we build out the app
 import { useEffect, useState, useMemo } from "react";
+//ethers is a utility library for interacting with the Ethereum blockchain, we'll be using it later
+import { ethers } from "ethers";
+// we import the ThirdwebSDK from the thirdweb sdk library, we'll use this
+import { ThirdwebSDK } from "@3rdweb/sdk";
 // we import the useWeb3 hook from the thirdweb hooks library
 import { useWeb3 } from "@3rdweb/hooks";
-// we import the ThirdwebSDK from the thirdweb sdk library
-import { ThirdwebSDK } from "@3rdweb/sdk";
-import { ethers } from "ethers";
-
+// this is just a little helper function to format long wallet addresses into something more readable, we'll use it later on
 const shortenAddress = (str) => {
   return str.substring(0, 6) + "..." + str.substring(str.length - 4);
 };

@@ -1,5 +1,10 @@
-//we are importing the sdk that we previously set up in the "initialize-sdk.js" file
-import * as sdk from "./initialize-sdk";
+// we are importing the sdk that we previously set up in the "1-initialize-sdk.js" file
+import sdk from "./1-initialize-sdk.js";
+
+// we'll need our old friend the bundleDrop again to setup claim conditions (the rules for who can claim the drop)
+const bundleDrop = sdk.getBundleDropModule(
+  "<DROP_MODULE_ADDRESS>",
+);
 
 /**
  *

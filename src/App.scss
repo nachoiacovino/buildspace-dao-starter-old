@@ -20,19 +20,37 @@
 }
 
 .container {
-  max-width: 960px;
+  width: 960px;
+  max-width: 100%;
+}
+
+.w-50 {
+  width: 50%;
 }
 
 .container-sm {
-  max-width: 720px;
+  width: 720px;
+  max-width: 100%;
 }
 
 .container-xs {
-  max-width: 340px;
+  width: 340px;
+  max-width: 100%;
 }
 
 .w-full {
   width: 100%;
+}
+
+.bg-white {
+  background: white;
+}
+
+.color-primary {
+  color: #7700ee;
+}
+.color-black {
+  color: #000;
 }
 
 .error {
@@ -41,6 +59,14 @@
 
 .p-1 {
   padding: 1rem;
+}
+.px-1 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.py-1 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .br-1 {
@@ -124,5 +150,6 @@ button {
     display: flex;
     align-items: center;
     border-bottom: 3px solid rgba(255, 255, 255, 0.8);
+    font-size: medium;
   }
 }

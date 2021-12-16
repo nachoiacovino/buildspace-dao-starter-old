@@ -1,15 +1,28 @@
 import "./App.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 // we import the useWeb3 hook from the thirdweb hooks library
 import { useWeb3 } from "@3rdweb/hooks";
 // we import the ThirdwebSDK from the thirdweb sdk library
 import { ThirdwebSDK } from "@3rdweb/sdk";
+import { ethers } from "ethers";
+
+function shortenAddress(str) {
+  return str.substring(0, 6) + "..." + str.substring(str.length - 4);
+}
 
 // we instatiate the sdk with the rinkeby network name
 const sdk = new ThirdwebSDK("rinkeby");
-// we can statically grab our budleDrop module from the sdk, we'll need it later
+// we can grab the bundleDropModule from the sdk, we'll need it later
 const bundleDropModule = sdk.getBundleDropModule(
   "0x6382AD08c47e2Cad024BAa240fCe9F349dd7b8a9",
+);
+// we can grab the tokenModule from the sdk, we'll need it later
+const tokenModule = sdk.getTokenModule(
+  "0x608fE848119636ecdAF36e827617a2030cd6f449",
+);
+// we can grab the tokenModule from the sdk, we'll need it later
+const voteModule = sdk.getVoteModule(
+  "0x166658A79df136FF5D332F8ba256440Fe594D563",
 );
 
 const App = () => {
@@ -71,7 +84,7 @@ const App = () => {
 
   // we need to get the memberlist from the bundleDrop module
   // to do this first we need to keep track of it somewhere, another useState!
-  const [memberList, setMemberList] = useState([]);
+  const [memberAddresses, setMemberAddresses] = useState([]);
 
   // we use this useEffect to get the memberlist if the connected wallet is a member (no need to fetch it if the user is not a mamber)
   useEffect(() => {
@@ -79,12 +92,13 @@ const App = () => {
       //nothing to do here
       return;
     }
-    // we use bundledrop module to get the memberlist
+    // we use bundledrop module to get all the addresses that have minted the nft
     bundleDropModule
-      .getAllClaimerAddresses()
+      // "0" is the id of the nft we want to get the memberlist of
+      .getAllClaimerAddresses("0")
       .then((addresses) => {
         // if it is successfull we just set the memberList into the state
-        setMemberList(addresses);
+        setMemberAddresses(addresses);
       })
       .catch((err) => {
         // if it fails we log the error to the console
@@ -92,7 +106,68 @@ const App = () => {
       });
   }, [hasClaimedNFT]);
 
-  console.log("*** memberlist", memberList);
+  // we would also like to display the token amount that the members holding, so we'll use another useState hook
+  const [memberTokenAmounts, setMemberTokenAmounts] = useState({});
+
+  //similarly to the useEffect before we'll use this useEffect to get the token amounts of the members (but only if the connected wallet is a member)
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here
+      return;
+    }
+    // we use the token module to get the token amounts of the members
+    tokenModule
+      .getAllHolderBalances()
+      .then((amounts) => {
+        // if it is successfull we just set the memberTokenAmounts into the state
+        setMemberTokenAmounts(amounts);
+      })
+      .catch((err) => {
+        // if it fails we log the error to the console
+        console.error("failed to get token amounts", err);
+      });
+  }, [hasClaimedNFT]);
+
+  // now we need to combine the memberAddresses and the token amounts into a single array
+  const memberList = useMemo(() => {
+    return memberAddresses.map((address) => {
+      return {
+        // we return back the address of the member
+        address,
+        // and we add on the tokenAmount of that member, oh hey our old friend the ethers.utils is back!
+        tokenAmount: ethers.utils.formatUnits(
+          // a member *may* have no tokens at all, in which case we'll fall back to passing 0
+          memberTokenAmounts[address] || 0,
+          // still the same token decimals as we used when we created the token (18)
+          18,
+        ),
+      };
+    });
+  }, [memberAddresses, memberTokenAmounts]);
+
+  // we want to keep track of current proposals, so we'll use another useState hook
+  const [proposals, setProposals] = useState([]);
+
+  //in order to fetch the proposals we'll use a useEffect hook again
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here, we don't want to fetch proposals if the user has not claimed their nft since we won't be displaying them
+      return;
+    }
+    // we use the vote module to get all the proposals
+    voteModule
+      .getAll()
+      .then((proposals) => {
+        // if it is successfull we just set the proposals into the state
+        setProposals(proposals);
+      })
+      .catch((err) => {
+        // if it fails we log the error to the console
+        console.error("failed to get proposals", err);
+      });
+  }, [hasClaimedNFT]);
+
+  console.log("*** proposals", proposals);
 
   // if there was some kind of error we want to display it
   if (error) {
@@ -175,14 +250,54 @@ const App = () => {
         <p>Congratulations on being a member</p>
 
         <div className="flex space-around w-full text-left">
-          <div className="flex column">
+          <div className="flex column w-50">
             <h2>Member List</h2>
-            <ul className="member-list">
-              <li className="p-1">foo</li>
-            </ul>
+            <table>
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>Token Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {memberList.map((member) => {
+                  return (
+                    <tr key={member.address}>
+                      <td>{shortenAddress(member.address)}</td>
+                      <td>{member.tokenAmount}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-          <div className="flex column">
+          <div className="flex column w-50">
             <h2>Active Votes</h2>
+            <div className="flex column">
+              {proposals.map((proposal, index) => (
+                <div
+                  key={proposal.proposalId}
+                  className="flex column bg-white p-1 br-1 color-black"
+                >
+                  <h5 className="color-primary">{proposal.description}</h5>
+                  <div className="flex space-between">
+                    {proposal.votes.map((vote) => (
+                      <div key={vote.type}>
+                        <input
+                          type="radio"
+                          id={proposal.proposalId + "-" + vote.type}
+                          name={proposal.proposalId}
+                          value={vote.type}
+                        />
+                        <label htmlFor={proposal.proposalId + "-" + vote.type}>
+                          {vote.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

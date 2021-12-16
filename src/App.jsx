@@ -18,9 +18,6 @@ const App = () => {
   return (
     <div className="container mx-auto my-auto align-center flex column text-center">
       <h1>Welcome to 🍪DAO</h1>
-      <button onClick={() => { }} className="btn-hero">
-        Connect your wallet
-      </button>
     </div>);
 };
 

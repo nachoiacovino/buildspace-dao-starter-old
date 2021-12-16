@@ -21,10 +21,6 @@ try {
   // this means that when there is a proposal to mint additional governance tokens, the vote module will be able to execute the minting if the proposal passes
   await tokenModule.grantRole("minter", voteModule.address);
 
-  //next we'll give the vote module permissions to transfer existing governance tokens
-  // this means that when there is a proposal to transfer existing governance tokens, the vote module will be able to execute the transfer if the proposal passes
-  await tokenModule.grantRole("transfer", voteModule.address);
-
   // we'll log out a success message when this is done
   console.log(
     "Successfully gave vote module permissions to act on token module",
@@ -52,22 +48,25 @@ try {
       {
         // the amount of a native token (in our case this is ETH on rinkeby) that may be sent if the propsal passes
         // in our case we're proposing to mint 50,000 additional governance tokens, there will not be any native token sent, so this should be 0
-        value: 0,
+        nativeTokenValue: 0,
 
         // the transaction data that the proposal should execute if it passes
         // "mint" here is the function that we want to execute on the token module
-        data: tokenModule.contract.interface.encodeFunctionData("mint", [
-          // the first parameter is the recipient of the tokens, we want to mint them to the DAO treasury, so we'll pass the address of the token module
-          tokenModule.address,
+        transactionData: tokenModule.contract.interface.encodeFunctionData(
+          "mint",
+          [
+            // the first parameter is the recipient of the tokens, we want to mint them to the DAO treasury, so we'll pass the address of the token module
+            voteModule.address,
 
-          // the second parameter defines how many additional tokens will be minted
-          // and our friendly neighborhood ethers utils are back to help us parse our amount to have 18 decimals
-          ethers.utils.parseUnits(amount.toString(), 18),
-        ]),
+            // the second parameter defines how many additional tokens will be minted
+            // and our friendly neighborhood ethers utils are back to help us parse our amount to have 18 decimals
+            ethers.utils.parseUnits(amount.toString(), 18),
+          ],
+        ),
 
         // if the proposal passes, which address do we want to call with the transaction data that we defined above
         // in our case we want to send it to the address of our token module
-        to: tokenModule.address,
+        toAddress: tokenModule.address,
       },
     ],
   );
@@ -96,22 +95,25 @@ try {
       {
         // the amount of a native token (in our case this is ETH on rinkeby) that may be sent if the propsal passes
         // in our case we're proposing to transfer 6,900 governance tokens, there will not be any native token sent, so this should be 0 again
-        value: 0,
+        nativeTokenValue: 0,
 
         // the transaction data that the proposal should execute if it passes
         // "mint" here is the function that we want to execute on the token module
-        data: tokenModule.contract.interface.encodeFunctionData("transfer", [
-          // the first parameter is the recipient of the tokens, we want to transfer them to ourselves, so we'll pass the public address of our wallet
-          process.env.WALLET_ADDRESS,
+        transactionData: tokenModule.contract.interface.encodeFunctionData(
+          "transfer",
+          [
+            // the first parameter is the recipient of the tokens, we want to transfer them to ourselves, so we'll pass the public address of our wallet
+            process.env.WALLET_ADDRESS,
 
-          // the second parameter defines how many tokens will be transferred
-          // 👏 please for the ethers utils as they are making their last appearance to help us parse the amount to have 18 decimals
-          ethers.utils.parseUnits(amount.toString(), 18),
-        ]),
+            // the second parameter defines how many tokens will be transferred
+            // 👏 please for the ethers utils as they are making their last appearance to help us parse the amount to have 18 decimals
+            ethers.utils.parseUnits(amount.toString(), 18),
+          ],
+        ),
 
         // if the proposal passes, which address do we want to call with the transaction data that we defined above
         // in our case we want to send it to the address of our token module again
-        to: tokenModule.address,
+        toAddress: tokenModule.address,
       },
     ],
   );

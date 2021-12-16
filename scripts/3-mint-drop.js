@@ -9,7 +9,7 @@ const bundleDrop = sdk.getBundleDropModule(
 );
 
 try {
-  await bundleDrop.lazyMintBatch([
+  await bundleDrop.createBatch([
     {
       name: "Chocolate Cookie",
       description: "This NFT will give you access to CookieDAO!",

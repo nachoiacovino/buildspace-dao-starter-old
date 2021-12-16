@@ -16,6 +16,11 @@ body {
 h1 {
   font-size: 5rem;
 }
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+}
 
 .unsupported-network {
   width: 340px;
@@ -37,7 +42,6 @@ h1 {
   background-color: #f00;
 }
 
-.landing,
 .connect-wallet,
 .mint-nft,
 .member-page {
@@ -65,7 +69,7 @@ h1 {
   width: 50%;
   gap: 1rem;
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .member-page > div {
     flex-direction: column;
   }

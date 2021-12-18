@@ -175,6 +175,40 @@ const App = () => {
   // we want to keep track of whether the wallet is currently voting or not, here goes another state hook
   const [isVoting, setIsVoting] = useState(false);
 
+  // we'll use this state to keep track of whether the connected wallet has already voted
+  const [hasVoted, setHasVoted] = useState(false);
+
+  // we need another useEffect to check if the connected wallet has already voted
+  useEffect(() => {
+    if (!hasClaimedNFT) {
+      //nothing to do here, we don't want to fetch proposals if the user has not claimed their nft since we won't be displaying them
+      return;
+    }
+
+    // if we have not fetched the proposals yet, we can't check if the user has voted
+    if (!proposals.length) {
+      return;
+    }
+
+    if (!address) {
+      // if there is no wallet connected we can't check if the user has voted and should re-set the state
+      setHasVoted(false);
+      return;
+    }
+
+    // since we currently only let users vote on all proposals at the same time we'll just check one proposal for now
+    voteModule
+      // we pass the proposalId to check and the wallet address to the function
+      .hasVoted(proposals[0].proposalId, address)
+      .then((hasVoted) => {
+        //hasVoted is a boolean, if it's true the user has voted
+        setHasVoted(hasVoted);
+      })
+      .catch((err) => {
+        console.error("failed to check if wallet has voted", err);
+      });
+  }, [hasClaimedNFT, proposals, address]);
+
   // if there was some kind of error we want to display it
   if (error) {
     // one common error happens when the user's wallet is connected to the wrong network
@@ -310,6 +344,10 @@ const App = () => {
                           }
                         })
                       );
+                      // if we get here that means we successfully voted, so let's set the "hasVoted" state to true
+                      setHasVoted(true);
+                      // and log out a success message
+                      console.log("successfully voted");
                     } catch (err) {
                       console.error("failed to execute votes", err);
                     }
@@ -346,8 +384,12 @@ const App = () => {
                   </div>
                 </div>
               ))}
-              <button disabled={isVoting} type="submit">
-                {isVoting ? "Voting..." : "Submit Votes"}
+              <button disabled={isVoting || hasVoted} type="submit">
+                {isVoting
+                  ? "Voting..."
+                  : hasVoted
+                  ? "You Already Voted"
+                  : "Submit Votes"}
               </button>
               <small>
                 This will trigger multiple transactions that you will need to
